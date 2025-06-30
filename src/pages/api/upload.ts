@@ -17,16 +17,17 @@ export default async function handler(
 ) {
   const form = formidable({ multiples: false });
 
-  const data = await new Promise<{ content: string }>((resolve, reject) => {
+  const data = await new Promise<{ fileName: string, content: string }>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) return reject(err);
 
       const file = Array.isArray(files.file) ? files.file[0] : files.file;
       if (!file || !file.filepath) {
         return reject(new Error("No file uploaded or file is invalid."));
-      }
+      };
+      const fileName = file.originalFilename || "unknown_file";
       const content = fs.readFileSync(file.filepath, "utf-8");
-      resolve({ content });
+      resolve({ fileName, content });
     });
   });
 
@@ -38,6 +39,7 @@ export default async function handler(
   const chunks = await splitter.createDocuments([data.content]);
 
   return res.status(200).json({
+    fileName: data.fileName,
     chunks: chunks.map((chunk, index) => ({
       index,
       content: chunk.pageContent,

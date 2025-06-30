@@ -2,7 +2,7 @@
 
 "use client";
 
-import { embedChunks, handleUpload } from "@/lib/utils";
+import { embedChunks, handleUpload, storeChunks } from "@/lib/utils";
 import { useState } from "react";
 
 export default function HomePage() {
@@ -23,11 +23,16 @@ export default function HomePage() {
     setLoading(true);
     setChunks([]);
     try {
-      const { chunks: newChunks } = await handleUpload(file);
+      const { fileName, chunks: newChunks } = await handleUpload(file);
       setChunks(newChunks);
       const chunkContents = newChunks.map((chunk) => chunk.content);
       const { embeddings } = await embedChunks(chunkContents);
       console.log("Embeddings:", embeddings);
+      const embeddingVectors= embeddings.map(
+        (embedding) => embedding.vector as number[]);
+      console.log("Embedding Vectors:", embeddingVectors);
+      const res = await storeChunks(chunkContents, embeddingVectors, fileName);
+      console.log("Stored chunks:", res);
     } catch (err) {
       console.error(err);
     } finally {
