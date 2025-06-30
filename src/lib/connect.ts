@@ -1,3 +1,5 @@
+/** @format */
+
 import { DataAPIClient, Db } from "@datastax/astra-db-ts";
 
 /**

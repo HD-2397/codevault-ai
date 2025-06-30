@@ -38,6 +38,9 @@ export default async function handler(
   const chunks = await splitter.createDocuments([data.content]);
 
   return res.status(200).json({
-    chunks: chunks.map((c) => c.pageContent),
+    chunks: chunks.map((chunk, index) => ({
+      index,
+      content: chunk.pageContent,
+    })),
   });
 }
