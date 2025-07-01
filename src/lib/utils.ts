@@ -13,6 +13,15 @@ export async function getUploadedFiles(): Promise<FileMetaData[]> {
   return await res.json();
 }
 
+export async function askQuestion(query: string, selectedFile: string): Promise<Response> {
+  const res= await fetch("/api/query", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fileName: selectedFile, query }),
+  });
+  return res;
+}
+
 export async function handleUpload(
   file: File
 ): Promise<{

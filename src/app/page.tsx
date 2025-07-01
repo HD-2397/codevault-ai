@@ -6,6 +6,12 @@ import { columns } from "@/components/shared/data-table/columns";
 import { DataTable } from "@/components/shared/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 import { FileMetaData } from "@/lib/interfaces";
 import {
   embedChunks,
@@ -14,6 +20,7 @@ import {
   storeChunks,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -22,6 +29,8 @@ export default function HomePage() {
   );
   const [loading, setLoading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<FileMetaData[]>([]); // Store fetched file metadata
+
+  const router = useRouter();
 
   async function fetchFiles() {
     const files = await getUploadedFiles();
@@ -85,25 +94,26 @@ export default function HomePage() {
           {loading ? "Uploading..." : "Upload & Chunk"}
         </Button>
       </section>
+      <Button onClick={() => router.push("/query")}>🔍 Go to Search</Button>
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">🧩 Preview Chunks</h2>
+
         {chunks.length === 0 && !loading ? (
           <p className="text-muted-foreground">No chunks yet</p>
         ) : (
-          <div className="space-y-4">
+          <Accordion type="multiple" className="w-full">
             {chunks.map((chunk) => (
-              <div
-                key={chunk.index}
-                className="rounded-lg border p-4 bg-muted text-sm overflow-auto"
-              >
-                <h3 className="font-semibold mb-2">Chunk {chunk.index + 1}</h3>
-                <pre className="whitespace-pre-wrap font-mono">
+              <AccordionItem key={chunk.index} value={`chunk-${chunk.index}`}>
+                <AccordionTrigger className="text-left font-semibold">
+                  Chunk {chunk.index + 1}
+                </AccordionTrigger>
+                <AccordionContent className="bg-muted rounded-md p-4 text-sm font-mono whitespace-pre-wrap overflow-auto">
                   {chunk.content}
-                </pre>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         )}
       </section>
 

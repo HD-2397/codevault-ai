@@ -5,13 +5,13 @@
 import { NextResponse } from "next/server";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { connectToDatabase } from "@/lib/connect";
-import OpenAI from "openai";
+import {OpenAI} from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: Request) {
   try {
-    const { query, topK = 5 } = await req.json();
+    const { query, topK = 5, fileName } = await req.json();
 
     if (!query) {
       return NextResponse.json(
@@ -33,13 +33,12 @@ export async function POST(req: Request) {
     const db = await connectToDatabase();
     const collection = db.collection("code_chunks");
 
-    const results = await collection.find(
-      {}, // no filtering
-      {
-        sort: { $vector: queryEmbedding },
-        limit: topK,
-      }
-    );
+    const filter = fileName ? { "metadata.fileName": fileName } : {};
+
+    const results = await collection.find(filter, {
+      sort: { $vector: queryEmbedding },
+      limit: topK,
+    });
 
     const chunks = await results.toArray();
     if (!chunks.length) {
@@ -67,30 +66,40 @@ export async function POST(req: Request) {
 
     const prompt =
       "You are a senior software engineer. Answer user questions using only the provided code context. If the context is insufficient, respond back politely. Be concise, accurate, and helpful.";
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4", // Or "gpt-3.5-turbo" for lower cost
-      temperature: 0.2,
-      messages: [
-        {
-          role: "system",
-          content: prompt,
-        },
-        {
-          role: "user",
-          content: `Code context:\n${context}\n\nQuestion: ${query}`,
-        },
-      ],
-    });
+      const response = await openai.chat.completions.create({
+        model: "gpt-4-turbo", // or 'gpt-3.5-turbo'
+        temperature: 0.2,
+        stream: true,
+        messages: [
+          {
+            role: "system",
+            content: prompt,
+          },
+          {
+            role: "user",
+            content: `Code context:\n${context}\n\nQuestion: ${query}`,
+          },
+        ],
+      });
 
-    const answer = completion.choices[0].message.content;
+      const stream = new ReadableStream({
+        async start(controller) {
+          for await (const chunk of response) {
+            const content = chunk.choices?.[0]?.delta?.content;
+            if (content) {
+              controller.enqueue(new TextEncoder().encode(content));
+            }
+          }
+          controller.close();
+        },
+      });
 
-    // ─────────────────────────────────────────────────────────────
-    // Step 5: Return the AI answer along with reference chunks
-    // ─────────────────────────────────────────────────────────────
-    return NextResponse.json({
-      answer,
-      chunks,
-    });
+      return new NextResponse(stream, {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+   
   } catch (error) {
     console.error("Search & Answer Error:", error);
     return NextResponse.json(
@@ -102,3 +111,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
