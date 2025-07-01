@@ -31,7 +31,6 @@ export default function HomePage() {
 
   async function fetchFiles() {
     const files = await getUploadedFiles();
-    console.log("Fetched files:", files);
     setUploadedFiles(files);
   }
 

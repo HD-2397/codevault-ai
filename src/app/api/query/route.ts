@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     const prompt =
       "You are a senior software engineer. Answer user questions using only the provided code context. If the context is insufficient, respond back politely. Be concise, accurate, and helpful.";
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo", // or 'gpt-3.5-turbo'
+      model: "gpt-4-turbo",
       temperature: 0.2,
       stream: true,
       messages: [

@@ -1,94 +1,92 @@
 # 🧠 CodeVault AI – Context-Aware Codebase Chat Assistant
 
-CodeVault AI is a powerful Generative AI project that allows developers to upload codebases and ask intelligent, context-aware questions about them. Whether you're exploring legacy code, debugging, or learning from example projects, CodeVault helps you interact with your code like never before.
+CodeVault AI is a powerful Generative AI project that enables developers to upload codebases and ask intelligent, **context-aware questions** about them. Whether you're exploring legacy systems, debugging, or learning from open-source projects, CodeVault helps you interact with your code like never before.
 
-This project showcases full-stack engineering and GenAI integration skills using cutting-edge technologies:
+This project showcases **full-stack engineering** and **GenAI integration** skills using cutting-edge technologies:
 
-* **Next.js (App Router)**
-* **TailwindCSS + shadcn/ui**
-* **OpenAI GPT-4 + text-embedding-3-small**
-* **AstraDB Vector Store (MongoDB-style)**
-* **LangChain (optional)**
+- **Next.js (App Router)**
+- **TailwindCSS + shadcn/ui**
+- **OpenAI GPT-4 + text-embedding-3-small**
+- **AstraDB Vector Store (MongoDB-style interface)**
+- **Streaming Answers with React + Edge APIs**
+- **Optional LangChain RAG Chain**
 
 ---
 
 ## 🔍 Features
 
-* 📁 Upload and chunk code files intelligently
-* 🧠 Store 1536-dim OpenAI embeddings into a vector DB
-* 🗂️ Search using vector similarity with metadata filtering (e.g., by filename)
-* 💬 Ask questions about the code and get high-quality GPT-4 answers with retrieved context
-* 🚀 Built with full streaming support for live answer generation
-* 🧩 Optional LangChain-based fallback mode
+- 📁 Upload and chunk code files with intelligent logic
+- 🧠 Store 1536-dim OpenAI embeddings into a vector DB
+- 🗂️ Perform vector similarity search with metadata filtering (e.g., by file name)
+- 💬 Ask questions about the code and get GPT-4 answers using relevant chunks
+- ⚡ Full streaming support for live answer generation
+- 🧩 Optional fallback mode using LangChain's `RetrievalQAChain`
 
 ---
 
 ## 🧠 RAG Design: Custom vs LangChain Chain
 
-| Feature                                    | Custom RAG (Used Here)                            | LangChain Chain (`RetrievalQAChain`)            |
-| ------------------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
-| 🔧 Control Over Pipeline                   | ✅ Full control over each step                     | 🚫 Abstracted, limited control                  |
-| 🧠 Prompt Customization                    | ✅ Manual injection of context and templating      | ⚠️ Limited flexibility unless extended manually |
-| 📦 External Dependencies                   | ✅ Minimal (OpenAI SDK + DB driver)                | ⚠️ Heavy dependency on LangChain                |
-| 🛠 Debuggability & Transparency            | ✅ Easy to inspect each component                  | 🚫 Internals often abstracted                   |
-| 🧪 Better for Learning / Interviews        | ✅ Shows low-level understanding and design skills | ⚠️ More black-box style integration             |
-| 🧩 Extensibility (e.g. metadata filtering) | ✅ Fine-grained filters (like file name, chunking) | ⚠️ Requires custom retriever logic              |
+| Feature                                    | Custom RAG (Used in App)                          | LangChain Chain (`RetrievalQAChain`)            |
+|-------------------------------------------|--------------------------------------------------|-------------------------------------------------|
+| 🔧 Control Over Pipeline                   | ✅ Full control over each step                    | 🚫 Abstracted, limited control                  |
+| 🧠 Prompt Customization                    | ✅ Manual context injection and templating        | ⚠️ Limited without customization                |
+| 📦 External Dependencies                   | ✅ Minimal (OpenAI SDK + DB driver)               | ⚠️ Requires LangChain dependencies              |
+| 🛠 Debuggability & Transparency            | ✅ Transparent and debuggable                     | 🚫 Internals often hidden                       |
+| 🧪 Better for Learning / Interviews        | ✅ Demonstrates low-level design skills           | ⚠️ High-level abstraction                       |
+| 🧩 Extensibility (e.g. metadata filtering) | ✅ Fine-grained control over chunk retrieval      | ⚠️ Needs custom retriever logic                 |
 
 ---
 
-## 🔀 Optional LangChain Support
+## ✅ Completed Feature: File-Based Question Filtering
 
-The codebase is modular, allowing an optional switch to LangChain's `RetrievalQAChain` for quicker prototyping or integration in LangChain-native workflows.
+Users can now:
+
+1. Select a file from a dropdown list of uploaded files
+2. Ask a question based on the selected file
+3. See answers **streamed live** in the UI via GPT-4
+
+This improves accuracy by narrowing context and reducing irrelevant chunk matches.
+
+---
+
+## 🚀 How It Works (Simplified)
 
 ```ts
-// Example flag
-const useLangChain = process.env.USE_LANGCHAIN === "true";
+// Server route
+POST /api/query {
+  // 1. Vector search
+  const similarChunks = await vectorStore.similaritySearch(query, { filter: { fileName } });
 
-if (useLangChain) {
-  const retriever = new AstraDBVectorStore(...).asRetriever();
-  const chain = RetrievalQAChain.fromLLM(llm, retriever);
-  const result = await chain.call({ query: userQuestion });
-} else {
-  // Use custom embedding + vector search + prompt
+  // 2. Construct prompt with chunks
+  const prompt = buildPrompt(similarChunks, query);
+
+  // 3. Stream GPT-4 completion
+  return OpenAI.stream({ model: "gpt-4", prompt });
 }
 ```
 
-This makes the project suitable for both custom low-level use cases and rapid chain-based applications.
-
----
-
-## 📁 Upcoming Feature: File-Based Question Filtering
-
-The next milestone is building a `/search` page where users can:
-
-1. Select a file from a dropdown list of uploaded files
-2. Ask a question specific to that file
-3. See answers **streamed live** as GPT-4 generates them
-
-This improves context precision, reducing unrelated chunk retrieval.
-
----
-
 ## 🧑‍💻 Who Should Check This Out?
 
-* Engineers preparing for **SDE II / AI-focused roles**
-* Developers interested in **custom RAG architecture**
-* Recruiters evaluating **hands-on GenAI projects**
+- Engineers preparing for **SDE II / AI-focused roles**
+- Developers interested in **custom RAG architecture**
+- Recruiters evaluating **hands-on GenAI projects**
 
 ---
 
 ## ⚙️ Tech Stack Summary
 
-* **Frontend**: Next.js 14 (App Router), TailwindCSS, shadcn/ui
-* **Backend**: Node.js API routes, Mongo-style AstraDB driver
-* **AI/Embedding**: OpenAI GPT-4 & text-embedding-3-small
-* **Vector DB**: AstraDB with \$vector search, metadata filters
-* **Optional**: LangChain.js for chain-based fallback
+- **Frontend**: Next.js 14 (App Router), TailwindCSS, shadcn/ui
+- **Backend**: Edge-compatible Node.js API routes, AstraDB vector search
+- **AI/Embedding**: OpenAI GPT-4 + `text-embedding-3-small`
+- **Vector DB**: AstraDB using `$vector` search and metadata filtering
+- **Streaming**: Fetch-based reader with live answer rendering
+- **Optional**: LangChain.js for `RetrievalQAChain` fallback
 
 ---
+
 
 ## 💬 Contact
 
 Built with ❤️ by Hardik.
 
-If you're hiring or collaborating on GenAI tools, [let's connect](mailto:your.email@example.com)!
+If you're hiring or collaborating on GenAI tools, [let's connect](mailto:hardik.dalmia@gmail.com)!

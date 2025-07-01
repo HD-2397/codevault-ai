@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     }
     //This will automatically use process.env.OPENAI_API_KEY if it's defined, need not pass it explicitly.
     const embedder = new OpenAIEmbeddings({
-      model: "text-embedding-3-small",
+      model: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
     });
 
     const embeddings = await embedder.embedDocuments(chunks);
