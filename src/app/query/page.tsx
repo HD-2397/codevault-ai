@@ -95,12 +95,16 @@ export default function SearchPage() {
 
       {/* Streaming Answer Output */}
       <div className="space-y-2">
-        <label className="font-medium">Answer</label>
-        <Card>
-          <CardContent className="p-4 whitespace-pre-wrap font-mono min-h-[150px] ">  
+        <label className="font-medium text-gray-800 dark:text-gray-200">
+          Answer
+        </label>
+        <Card className="bg-gray-100 dark:bg-[#1e1e1e] border border-gray-300 dark:border-gray-700 shadow-sm">
+          <CardContent className="p-4 min-h-[150px] overflow-auto rounded-md">
+            <div className="prose dark:prose-invert max-w-none font-mono text-sm whitespace-pre-wrap">
               <ReactMarkdown>
                 {answer || (loading ? "Generating answer..." : "No answer yet")}
               </ReactMarkdown>
+            </div>
           </CardContent>
         </Card>
       </div>

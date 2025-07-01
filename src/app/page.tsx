@@ -20,7 +20,6 @@ import {
   storeChunks,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -29,8 +28,6 @@ export default function HomePage() {
   );
   const [loading, setLoading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<FileMetaData[]>([]); // Store fetched file metadata
-
-  const router = useRouter();
 
   async function fetchFiles() {
     const files = await getUploadedFiles();
@@ -94,7 +91,6 @@ export default function HomePage() {
           {loading ? "Uploading..." : "Upload & Chunk"}
         </Button>
       </section>
-      <Button onClick={() => router.push("/query")}>🔍 Go to Search</Button>
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">🧩 Preview Chunks</h2>

@@ -66,40 +66,43 @@ export async function POST(req: Request) {
 
     const prompt =
       "You are a senior software engineer. Answer user questions using only the provided code context. If the context is insufficient, respond back politely. Be concise, accurate, and helpful.";
-      const response = await openai.chat.completions.create({
-        model: "gpt-4-turbo", // or 'gpt-3.5-turbo'
-        temperature: 0.2,
-        stream: true,
-        messages: [
-          {
-            role: "system",
-            content: prompt,
-          },
-          {
-            role: "user",
-            content: `Code context:\n${context}\n\nQuestion: ${query}`,
-          },
-        ],
-      });
+    const response = await openai.chat.completions.create({
+      model: "gpt-4-turbo", // or 'gpt-3.5-turbo'
+      temperature: 0.2,
+      stream: true,
+      messages: [
+        {
+          role: "system",
+          content: prompt,
+        },
+        {
+          role: "user",
+          content: `Code context:\n${context}\n\nQuestion: ${query}`,
+        },
+      ],
+    });
 
-      const stream = new ReadableStream({
-        async start(controller) {
-          for await (const chunk of response) {
-            const content = chunk.choices?.[0]?.delta?.content;
-            if (content) {
-              controller.enqueue(new TextEncoder().encode(content));
-            }
+    // ─────────────────────────────────────────────────────────────
+    // Step 5: Stream the response in a text/plain format
+    // ─────────────────────────────────────────────────────────────
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of response) {
+          const content = chunk.choices?.[0]?.delta?.content;
+          if (content) {
+            controller.enqueue(new TextEncoder().encode(content));
           }
-          controller.close();
-        },
-      });
+        }
+        controller.close();
+      },
+    });
 
-      return new NextResponse(stream, {
-        headers: {
-          "Content-Type": "text/plain",
-        },
-      });
-   
+    return new NextResponse(stream, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   } catch (error) {
     console.error("Search & Answer Error:", error);
     return NextResponse.json(
