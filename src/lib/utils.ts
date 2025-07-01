@@ -2,14 +2,24 @@
 
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { FileMetaData } from "./interfaces";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export async function getUploadedFiles(): Promise<FileMetaData[]> {
+  const res = await fetch("/api/fetchFiles", { method: "GET" });
+  return await res.json();
+}
+
 export async function handleUpload(
   file: File
-): Promise<{ fileName: string; chunks: { index: number; content: string }[] }> {
+): Promise<{
+  fileName: string;
+  fileSizeKB: number;
+  chunks: { index: number; content: string }[];
+}> {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -19,7 +29,11 @@ export async function handleUpload(
   });
 
   const data = await res.json();
-  return { fileName: data.fileName, chunks: data.chunks };
+  return {
+    fileName: data.fileName,
+    fileSizeKB: data.fileSizeKB,
+    chunks: data.chunks,
+  };
 }
 
 export async function embedChunks(
@@ -40,14 +54,15 @@ export async function embedChunks(
 export async function storeChunks(
   chunks: string[],
   embeddings: number[][],
-  fileName: string
+  fileName: string,
+  fileSizeKB: number
 ): Promise<{ success: boolean; inserted: number }> {
   const res = await fetch("/api/storeChunks", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ chunks, embeddings, fileName }),
+    body: JSON.stringify({ chunks, embeddings, fileName, fileSizeKB }),
   });
 
   if (!res.ok) {

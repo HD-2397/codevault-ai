@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 CodeVault AI – Context-Aware Codebase Chat Assistant
 
-## Getting Started
+CodeVault AI is a powerful Generative AI project that allows developers to upload codebases and ask intelligent, context-aware questions about them. Whether you're exploring legacy code, debugging, or learning from example projects, CodeVault helps you interact with your code like never before.
 
-First, run the development server:
+This project showcases full-stack engineering and GenAI integration skills using cutting-edge technologies:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+* **Next.js (App Router)**
+* **TailwindCSS + shadcn/ui**
+* **OpenAI GPT-4 + text-embedding-3-small**
+* **AstraDB Vector Store (MongoDB-style)**
+* **LangChain (optional)**
+
+---
+
+## 🔍 Features
+
+* 📁 Upload and chunk code files intelligently
+* 🧠 Store 1536-dim OpenAI embeddings into a vector DB
+* 🗂️ Search using vector similarity with metadata filtering (e.g., by filename)
+* 💬 Ask questions about the code and get high-quality GPT-4 answers with retrieved context
+* 🚀 Built with full streaming support for live answer generation
+* 🧩 Optional LangChain-based fallback mode
+
+---
+
+## 🧠 RAG Design: Custom vs LangChain Chain
+
+| Feature                                    | Custom RAG (Used Here)                            | LangChain Chain (`RetrievalQAChain`)            |
+| ------------------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
+| 🔧 Control Over Pipeline                   | ✅ Full control over each step                     | 🚫 Abstracted, limited control                  |
+| 🧠 Prompt Customization                    | ✅ Manual injection of context and templating      | ⚠️ Limited flexibility unless extended manually |
+| 📦 External Dependencies                   | ✅ Minimal (OpenAI SDK + DB driver)                | ⚠️ Heavy dependency on LangChain                |
+| 🛠 Debuggability & Transparency            | ✅ Easy to inspect each component                  | 🚫 Internals often abstracted                   |
+| 🧪 Better for Learning / Interviews        | ✅ Shows low-level understanding and design skills | ⚠️ More black-box style integration             |
+| 🧩 Extensibility (e.g. metadata filtering) | ✅ Fine-grained filters (like file name, chunking) | ⚠️ Requires custom retriever logic              |
+
+---
+
+## 🔀 Optional LangChain Support
+
+The codebase is modular, allowing an optional switch to LangChain's `RetrievalQAChain` for quicker prototyping or integration in LangChain-native workflows.
+
+```ts
+// Example flag
+const useLangChain = process.env.USE_LANGCHAIN === "true";
+
+if (useLangChain) {
+  const retriever = new AstraDBVectorStore(...).asRetriever();
+  const chain = RetrievalQAChain.fromLLM(llm, retriever);
+  const result = await chain.call({ query: userQuestion });
+} else {
+  // Use custom embedding + vector search + prompt
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This makes the project suitable for both custom low-level use cases and rapid chain-based applications.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Upcoming Feature: File-Based Question Filtering
 
-## Learn More
+The next milestone is building a `/search` page where users can:
 
-To learn more about Next.js, take a look at the following resources:
+1. Select a file from a dropdown list of uploaded files
+2. Ask a question specific to that file
+3. See answers **streamed live** as GPT-4 generates them
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This improves context precision, reducing unrelated chunk retrieval.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧑‍💻 Who Should Check This Out?
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Engineers preparing for **SDE II / AI-focused roles**
+* Developers interested in **custom RAG architecture**
+* Recruiters evaluating **hands-on GenAI projects**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## ⚙️ Tech Stack Summary
+
+* **Frontend**: Next.js 14 (App Router), TailwindCSS, shadcn/ui
+* **Backend**: Node.js API routes, Mongo-style AstraDB driver
+* **AI/Embedding**: OpenAI GPT-4 & text-embedding-3-small
+* **Vector DB**: AstraDB with \$vector search, metadata filters
+* **Optional**: LangChain.js for chain-based fallback
+
+---
+
+## 💬 Contact
+
+Built with ❤️ by Hardik.
+
+If you're hiring or collaborating on GenAI tools, [let's connect](mailto:your.email@example.com)!
