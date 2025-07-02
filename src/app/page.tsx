@@ -74,7 +74,7 @@ export default function HomePage() {
     <main className="max-w-4xl mx-auto p-6 sm:p-10 space-y-10">
       <section className="space-y-4">
         <h1 className="text-3xl font-bold tracking-tight">
-          📄 Upload Code File
+          📄 Upload Code/PDF File
         </h1>
         <Input
           id="uploadFile"
