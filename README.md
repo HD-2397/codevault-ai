@@ -1,6 +1,6 @@
 # 🧠 CodeVault AI – Context-Aware Codebase Chat Assistant
 
-CodeVault AI is a powerful Generative AI project that enables developers to upload codebases and ask intelligent, **context-aware questions** about them. Whether you're exploring legacy systems, debugging, or learning from open-source projects, CodeVault helps you interact with your code like never before.
+CodeVault AI is a powerful Generative AI project that enables developers to upload **codebases** and now even **PDF documents**, and ask intelligent, **context-aware questions** about them. Whether you're exploring legacy systems, debugging, learning from open-source projects, or analyzing technical PDFs, CodeVault helps you interact with your content like never before.
 
 This project showcases **full-stack engineering** and **GenAI integration** skills using cutting-edge technologies:
 
@@ -10,15 +10,16 @@ This project showcases **full-stack engineering** and **GenAI integration** skil
 - **AstraDB Vector Store (MongoDB-style interface)**
 - **Streaming Answers with React + Edge APIs**
 - **Optional LangChain RAG Chain**
+- **PDF Text Extraction with `pdf-parse`**
 
 ---
 
 ## 🔍 Features
 
-- 📁 Upload and chunk code files with intelligent logic
+- 📁 Upload and chunk **code files or PDFs** with intelligent logic
 - 🧠 Store 1536-dim OpenAI embeddings into a vector DB
 - 🗂️ Perform vector similarity search with metadata filtering (e.g., by file name)
-- 💬 Ask questions about the code and get GPT-4 answers using relevant chunks
+- 💬 Ask questions about the uploaded code or PDF and get GPT-4 answers using relevant chunks
 - ⚡ Full streaming support for live answer generation
 - 🧩 Optional fallback mode using LangChain's `RetrievalQAChain`
 
@@ -46,6 +47,19 @@ Users can now:
 3. See answers **streamed live** in the UI via GPT-4
 
 This improves accuracy by narrowing context and reducing irrelevant chunk matches.
+
+---
+
+## 📄 New Feature: PDF Upload Support
+
+You can now upload **.pdf documents** to:
+
+- Parse and extract their text server-side
+- Chunk them using `RecursiveCharacterTextSplitter`
+- Embed them into the vector DB alongside code files
+- Ask context-aware questions about technical PDFs (e.g., specs, research, design docs)
+
+The server detects PDF uploads and uses `pdf-parse` to handle them seamlessly.
 
 ---
 
@@ -77,15 +91,14 @@ POST /api/query {
 
 - **Frontend**: Next.js 14 (App Router), TailwindCSS, shadcn/ui
 - **Backend**: Edge-compatible Node.js API routes, AstraDB vector search
-- **file uploads**: `Formidable` library
-- **File chunking**: `RecursiveCharacterTextSplitter` from langchain
+- **File uploads**: `Formidable` library for multi-part handling
+- **Code/PDF chunking**: `RecursiveCharacterTextSplitter` (langchain) / pdf-parse → text → Splitter
 - **AI/Embedding**: OpenAI GPT-4 + `text-embedding-3-small`
 - **Vector DB**: AstraDB using `$vector` search and metadata filtering
 - **Streaming**: Fetch-based reader with live answer rendering
 - **Optional**: LangChain.js for `RetrievalQAChain` fallback
 
 ---
-
 
 ## 💬 Contact
 
