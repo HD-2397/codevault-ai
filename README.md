@@ -77,6 +77,8 @@ POST /api/query {
 
 - **Frontend**: Next.js 14 (App Router), TailwindCSS, shadcn/ui
 - **Backend**: Edge-compatible Node.js API routes, AstraDB vector search
+- **file uploads**: `Formidable` library
+- **File chunking**: `RecursiveCharacterTextSplitter` from langchain
 - **AI/Embedding**: OpenAI GPT-4 + `text-embedding-3-small`
 - **Vector DB**: AstraDB using `$vector` search and metadata filtering
 - **Streaming**: Fetch-based reader with live answer rendering

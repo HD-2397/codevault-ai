@@ -79,7 +79,7 @@ export default function HomePage() {
         <Input
           id="uploadFile"
           type="file"
-          accept=".ts,.js,.jsx,.tsx,.py,.txt,.cpp,.java,.go,.rb"
+          accept=".ts,.js,.jsx,.tsx,.py,.txt,.cpp,.java,.go,.rb, .pdf"
           onChange={handleFileChange}
         />
         <Button
