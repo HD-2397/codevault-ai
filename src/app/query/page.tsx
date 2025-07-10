@@ -28,7 +28,7 @@ export default function SearchPage() {
   // Fetch list of uploaded files
   async function fetchFiles() {
       const files = await getUploadedFiles();
-      setUploadedFiles(files);
+      setUploadedFiles(files || []);
     }
   
     useEffect(() => {
