@@ -34,7 +34,10 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: chunks, error } = await supabase.rpc("match_code_chunks", {
+    const supabaseRPC =
+      process.env.SUPABASE_RPC_FUNCTION || "match_code_chunks";
+
+    const { data: chunks, error } = await supabase.rpc(supabaseRPC, {
       query_embedding: queryEmbedding,
       match_count: topK,
       target_file_name: fileName ?? null, // Send null if no filename filter

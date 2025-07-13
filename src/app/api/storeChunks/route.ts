@@ -27,8 +27,11 @@ export async function POST(req: Request) {
     // ─────────────────────────────────────────────────────────────
     // 1️⃣ Insert file metadata if not already uploaded
     // ─────────────────────────────────────────────────────────────
+
+    const fileMetaCollection =
+      process.env.SUPABASE_FILE_META_COLLECTION || "file_metadata";
     const { data: existingFile, error: fetchError } = await supabase
-      .from("file_metadata")
+      .from(fileMetaCollection)
       .select("id")
       .eq("file_name", fileName)
       .maybeSingle();
@@ -46,7 +49,7 @@ export async function POST(req: Request) {
 
     if (!existingFile) {
       const { error: insertMetaError } = await supabase
-        .from("file_metadata")
+        .from(fileMetaCollection)
         .insert([
           {
             file_name: fileName,
@@ -80,8 +83,11 @@ export async function POST(req: Request) {
       uploaded_at: uploadedAt,
     }));
 
+    const codeChunkCollection =
+      process.env.SUPABASE_FILE_CHUNK_COLLECTION || "code_chunks";
+
     const { error: insertChunkError } = await supabase
-      .from("code_chunks")
+      .from(codeChunkCollection)
       .insert(chunkDocs);
 
     if (insertChunkError) {

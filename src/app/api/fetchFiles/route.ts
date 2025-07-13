@@ -10,8 +10,11 @@ export async function GET() {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    const fileMetaCollection =
+      process.env.SUPABASE_FILE_META_COLLECTION || "file_metadata";
+
     const response = await supabase
-      .from("file_metadata")
+      .from(fileMetaCollection)
       .select("id, file_name, uploaded_at, file_size_kb, total_chunks");
 
     return NextResponse.json(response.data);
