@@ -1,11 +1,10 @@
 /** @format */
 
-// /app/api/search/route.ts
-
 import { NextResponse } from "next/server";
 import { OpenAIEmbeddings } from "@langchain/openai";
-import { connectToDatabase } from "@/lib/connect";
-import {OpenAI} from "openai";
+import { OpenAI } from "openai";
+import { createClient } from "@supabase/supabase-js";
+import { MatchedCodeChunk } from "@/lib/interfaces";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -28,24 +27,25 @@ export async function POST(req: Request) {
     const [queryEmbedding] = await embedder.embedDocuments([query]);
 
     // ─────────────────────────────────────────────────────────────
-    // Step 2: Perform vector similarity search in Astra DB
+    // Step 2: Perform vector similarity search in Supabase
     // ─────────────────────────────────────────────────────────────
-    const db = await connectToDatabase();
-    const collection = db.collection("code_chunks");
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-    const filter = fileName ? { "metadata.fileName": fileName } : {};
-
-    const results = await collection.find(filter, {
-      sort: { $vector: queryEmbedding },
-      limit: topK,
+    const { data: chunks, error } = await supabase.rpc("match_code_chunks", {
+      query_embedding: queryEmbedding,
+      match_count: topK,
+      target_file_name: fileName ?? null, // Send null if no filename filter
     });
 
-    const chunks = await results.toArray();
-    if (!chunks.length) {
-      return NextResponse.json({
-        answer: "No relevant code found to answer your question.",
-        chunks: [],
-      });
+    if (error) {
+      console.error("Supabase RPC error:", error);
+      return NextResponse.json(
+        { error: "Failed to perform vector search" },
+        { status: 500 }
+      );
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -53,8 +53,8 @@ export async function POST(req: Request) {
     // ─────────────────────────────────────────────────────────────
     const context = chunks
       .map(
-        (doc, idx) =>
-          `Chunk ${idx + 1} (File: ${doc.metadata?.fileName || "unknown"}):\n${
+        (doc: MatchedCodeChunk, idx: number) =>
+          `Chunk ${idx + 1} (File: ${doc.file_name || "unknown"}):\n${
             doc.content
           }`
       )
@@ -114,5 +114,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
-

@@ -1,23 +1,22 @@
 /** @format */
 
-import { connectToDatabase } from "@/lib/connect";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const db = await connectToDatabase();
-    const filesCollection = db.collection(
-      process.env.ASTRA_DB_FILE_COLLECTION || "files"
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const files = await filesCollection
-      .find({}, { projection: { _id: 0 } }) // hide internal Mongo IDs
-      .sort({ uploadedAt: -1 })
-      .toArray();
+    const response = await supabase
+      .from("file_metadata")
+      .select("id, file_name, uploaded_at, file_size_kb, total_chunks");
 
-    return NextResponse.json(files);
+    return NextResponse.json(response.data);
   } catch (error) {
-    console.error("Failed to fetch files:", error);
+    console.error("Failed to fetch files from supabase:", error);
     return NextResponse.json(
       { error: "Failed to fetch files" },
       { status: 500 }

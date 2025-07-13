@@ -27,13 +27,14 @@ export default function SearchPage() {
 
   // Fetch list of uploaded files
   async function fetchFiles() {
-      const files = await getUploadedFiles();
-      setUploadedFiles(files || []);
-    }
-  
-    useEffect(() => {
-      fetchFiles(); // Fetch files on component mount
-    }, []);
+    const files = await getUploadedFiles();
+    console.log("FILES***********************88", files);
+    setUploadedFiles(files || []);
+  }
+
+  useEffect(() => {
+    fetchFiles(); // Fetch files on component mount
+  }, []);
 
   // Stream query answer
   const handleQuery = async () => {
@@ -56,7 +57,9 @@ export default function SearchPage() {
 
   return (
     <main className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">🔍 Ask Questions About Your Code</h1>
+      <h1 className="text-2xl font-bold">
+        🔍 Ask Questions About Your Code/PDF
+      </h1>
 
       {/* File Selector */}
       <div className="space-y-2">
@@ -66,11 +69,17 @@ export default function SearchPage() {
             <SelectValue placeholder="Choose a file" />
           </SelectTrigger>
           <SelectContent>
-            {uploadedFiles.map((file) => (
-              <SelectItem key={file.fileName} value={file.fileName}>
-                {file.fileName} ({file.totalChunks} chunks)
+            {!!!uploadedFiles || uploadedFiles.length === 0 ? (
+              <SelectItem disabled value="no-files">
+                No files uploaded yet
               </SelectItem>
-            ))}
+            ) : (
+              uploadedFiles.map((file) => (
+                <SelectItem key={file.file_name} value={file.file_name}>
+                  {file.file_name} ({file.total_chunks} chunks)
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>

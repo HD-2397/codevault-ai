@@ -8,7 +8,6 @@ import Footer from "@/components/shared/footer";
 import Header from "@/components/shared/header";
 import { Analytics } from "@vercel/analytics/next";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -31,9 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
         <Header />
         <main className="min-h-[80vh] max-w-5xl mx-auto px-4 py-8">
           {children}

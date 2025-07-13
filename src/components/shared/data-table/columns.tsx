@@ -1,26 +1,28 @@
 /** @format */
 
-"use client";
-
 import { FileMetaData } from "@/lib/interfaces";
 import { ColumnDef } from "@tanstack/react-table";
-
+import { format } from "date-fns";
 
 export const columns: ColumnDef<FileMetaData>[] = [
   {
-    accessorKey: "fileName",
+    accessorKey: "file_name",
     header: "Name",
   },
   {
-    accessorKey: "uploadedAt",
+    accessorKey: "uploaded_at",
     header: "Uploaded at",
+    cell: ({ row }) => {
+      const date: string = row.getValue("uploaded_at");
+      return format(new Date(date), "dd MMM yyyy, HH:mm");
+    },
   },
   {
-    accessorKey: "fileSizeKB",
+    accessorKey: "file_size_kb",
     header: "File Size (KB)",
   },
   {
-    accessorKey: "totalChunks",
+    accessorKey: "total_chunks",
     header: "Total Chunks",
   },
 ];

@@ -10,11 +10,11 @@ export default function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-700 bg-gray-900 px-6 py-4 shadow-sm text-white dark:bg-black dark:border-gray-800">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 border-border backdrop-blur-md px-6 py-4 shadow-sm">
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <Link
           href="/"
-          className="text-xl font-semibold text-white hover:text-gray-300"
+          className="text-xl font-semibold text-foreground hover:opacity-80 transition-colors"
         >
           🧠 CodeVault AI
         </Link>
@@ -23,8 +23,8 @@ export default function Header() {
           <Link
             href="/"
             className={cn(
-              "text-sm font-medium hover:text-gray-300",
-              pathname === "/" ? "text-white" : "text-gray-400"
+              "text-sm font-medium transition-colors hover:opacity-80",
+              pathname === "/" ? "text-foreground" : "text-muted-foreground"
             )}
           >
             Upload
@@ -32,8 +32,10 @@ export default function Header() {
           <Link
             href="/query"
             className={cn(
-              "text-sm font-medium hover:text-gray-300",
-              pathname === "/query" ? "text-white" : "text-gray-400"
+              "text-sm font-medium transition-colors hover:opacity-80",
+              pathname === "/query"
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
           >
             Ask a question
